@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+[Tt]humbs.db
+Updates/
+Pictures/
+[Ll]ibrary/
+[Tt]emp/

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>DunGenPlus</AssemblyName>
+    <RootNamespace>DunGenPlus</RootNamespace>
+    <Version>1.4.1</Version>
+    <LangVersion>latest</LangVersion>
+    <DebugType>embedded</DebugType>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <!-- Source layout -->
+  <ItemGroup>
+    <!-- Don't compile the Unity Editor project if present -->
+    <Compile Remove="..\DunGenPlusEditor\**\*.cs" />
+    <!-- Don't recursively pull the nested prebuilt DLL folder -->
+    <Compile Remove="DunGenPlus\**" />
+  </ItemGroup>
+
+  <!-- Embedded resources -->
+  <ItemGroup>
+    <EmbeddedResource Include="dungen" />
+  </ItemGroup>
+
+  <!-- Build-time only -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Common runtime deps -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="IAmBatby-LethalLevelLoader" Version="1.6.9" Publicize="true" />
+  </ItemGroup>
+
+  <!-- Local game DLLs from a Steam install -->
+  <ItemGroup Condition="$(CI) != 'true'">
+    <Reference Include="Assembly-CSharp" Publicize="true">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Runtime">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="DunGen" Publicize="true">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/DunGen.dll</HintPath>
+    </Reference>
+    <Reference Include="DunGen.Integration.UnityNav">
+      <HintPath>$(LethalCompanyDir)Lethal Company_Data/Managed/DunGen.Integration.UnityNav.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- CI gets the game DLLs from NuGet -->
+  <ItemGroup Condition="$(CI) == 'true'">
+    <PackageReference Include="LethalCompany.GameLibs.Steam" Version="*-*" Publicize="true" />
+  </ItemGroup>
+
+  <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
+    </ItemGroup>
+  </Target>
+</Project>
